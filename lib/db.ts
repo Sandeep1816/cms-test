@@ -1,8 +1,24 @@
 import { prisma } from "./prisma"
 
+type ProjectDB = {
+  id: string
+  name: string
+  description: string | null
+  venue: string | null
+  website: string | null
+  image?: string | null
+  year: string
+  currency: string | null
+  startDate: Date | null
+  endDate: Date | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+
 export async function getProjects() {
   try {
-    const projects = await prisma.project.findMany({
+    const projects: ProjectDB[] = await prisma.project.findMany({
       orderBy: {
         createdAt: "desc",
       },
@@ -21,7 +37,8 @@ export async function getProjects() {
         updatedAt: true,
       },
     })
-    return projects.map(project => ({
+
+    return projects.map((project: ProjectDB) => ({
       ...project,
       _id: project.id,
     }))
@@ -30,22 +47,3 @@ export async function getProjects() {
     return []
   }
 }
-
-export async function getProject(id: string) {
-  try {
-    const project = await prisma.project.findUnique({
-      where: { id },
-      include: {
-        stats: true,
-      },
-    })
-    if (!project) return null
-    return {
-      ...project,
-      _id: project.id,
-    }
-  } catch (error) {
-    console.error("Error fetching project:", error)
-    return null
-  }
-} 
