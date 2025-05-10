@@ -1,3 +1,4 @@
+// app/components/agenda/types.ts
 export interface Speaker {
   _id: string;
   name: string;
@@ -31,4 +32,4 @@ export interface AgendaDay {
   date: string;
   dayNumber: number;
   sessions: AgendaSession[];
-} 
+}

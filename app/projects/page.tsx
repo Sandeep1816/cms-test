@@ -1,54 +1,93 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
-export default function ProjectPage() {
-  const [projects, setProjects] = useState<any[]>([]);
+interface Project {
+  _id: string;
+  name: string;
+  description: string;
+  venue: string;
+  website: string;
+  year: string;
+  currency: string;
+  startDate: string;
+  endDate: string;
+  image?: string;
+}
+
+export default function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/projects')
-      .then((res) => res.json())
-      .then((data) => setProjects(data));
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch('/api/projects');
+        if (!response.ok) {
+          throw new Error('Failed to fetch projects');
+        }
+        const data: Project[] = await response.json();
+        setProjects(data);
+      } catch (error) {
+        setError('Error loading projects. Please try again later.');
+        console.error('Error fetching projects:', error);
+      }
+    };
+
+    fetchProjects();
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 px-6 py-12 sm:px-12 lg:px-24">
-      <h1 className="text-4xl font-bold text-center mb-12 text-gray-800">Our Projects</h1>
+    <div className="min-h-screen bg-[#fdfdfd] px-6 py-16 sm:px-12 lg:px-20 font-[family-name:var(--font-geist-sans)]">
+      <h1 className="text-4xl sm:text-5xl font-serif font-bold text-center mb-16 text-gray-900 tracking-tight">
+        Our Projects
+      </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {projects.map((project) => (
-          <div
-            key={project.id}
-            className="bg-white rounded-2xl shadow-md hover:shadow-lg transition duration-300 border border-gray-200 overflow-hidden"
-          >
-            {project.image && (
-              <img
-                src={project.image}
-                alt={project.name}
-                className="w-full h-48 object-cover"
-              />
-            )}
-            <div className="p-6 flex flex-col justify-between h-full">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">{project.name}</h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {project.year} • {project.venue}
-                </p>
-                <p className="text-sm text-gray-700 mt-4 line-clamp-3">{project.description}</p>
+      {error && <p className="text-red-600 text-center font-medium mb-6">{error}</p>}
+
+      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {projects.length === 0 ? (
+          <p className="col-span-full text-center text-gray-600 font-serif text-lg">Loading projects...</p>
+        ) : (
+          projects.map((project) => (
+            <div
+              key={project._id}
+              className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col"
+            >
+              <div className="relative">
+                <Image
+                  src={project.image || '/placeholder.svg'}
+                  alt={project.name}
+                  width={500}
+                  height={250}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
               </div>
-              <div className="mt-4">
-                <a
-                  href={project.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition "
-                >
-                  Visit Website
-                </a>
+
+              <div className="p-6 flex flex-col flex-grow">
+                <h2 className="text-xl font-serif font-semibold text-gray-800 mb-1">{project.name}</h2>
+                <p className="text-sm text-gray-500 italic mb-2">{project.venue}</p>
+                <p className="text-sm text-gray-700 line-clamp-3 leading-relaxed mb-4">{project.description}</p>
+
+                <div className="mt-auto border-t pt-4 text-sm text-gray-600">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">
+                    {project.year} • {project.currency}
+                  </p>
+                  <a
+                    href={project.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-2 text-indigo-600 hover:text-indigo-800 font-medium transition"
+                  >
+                    Visit Website →
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
