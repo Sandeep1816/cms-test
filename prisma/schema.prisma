@@ -1,344 +1,319 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
 }
 
 datasource db {
   provider = "mongodb"
-  url      = env("MONGODB_URI")
+  url      = env("DATABASE_URL")
 }
 
-model Project {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
-  venue       String?
-  website     String?
-  image       String?
-  year        String
-  currency    String?
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  stats           ProjectStats?
-  attendees       Attendee[]
-  delegates       Delegate[]
-  speakers        Speaker[]
-  marketingCampaigns MarketingCampaign[]
-  leads           Lead[]
-  sessions        Session[]
-  exhibitors      Exhibitor[]
-  sponsors        Sponsor[]
-  partners        Partner[]
-  mediaPartners   MediaPartner[]
-  orders          Order[]
-  enquiries       Enquiry[]
-  utmData         UtmData[]
-  agendaDays      AgendaDay[]
-}
-
-model ProjectStats {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  speakers    Int      @default(0)
-  partners    Int      @default(0)
-  mediaPartners Int    @default(0)
-  sponsors    Int      @default(0)
-  exhibitors  Int      @default(0)
-  delegates   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @unique @db.ObjectId
-}
-
-model Attendee {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  email       String
-  phone       String?
-  company     String?
-  jobTitle    String?
-  checkedIn   Boolean  @default(false)
-  checkinTime DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model Delegate {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  email       String?
-  phone       String?
-  company     String?
-  jobTitle    String?
-  address     String?
-  booth       String?
-  status      String?
-  description String?
-  priority    Int      @default(0)
-  featured    Boolean  @default(false)
-  type        String
-  image       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model Speaker {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  email       String?
-  phone       String?
-  company     String?
-  position    String?
-  bio         String?
-  featured    Boolean  @default(false)
-  image       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-  
-  // Many-to-many relation with AgendaItem
-  agendaItems AgendaItemSpeaker[]
-}
-
-model MarketingCampaign {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  type        String
-  total       Int      @default(0)
-  revenue     Float    @default(0)
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model Lead {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  email         String
-  contact       String?
-  company       String?
-  type          String?
-  date          DateTime?
-  qualifyStatus String?
-  salesStatus   String?
-  notes         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Relations
-  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId     String   @db.ObjectId
-}
-
-model Session {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String?
-  startTime   String
-  endTime     String
-  date        DateTime?
-  venue       String?
-  day         Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model Exhibitor {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  image       String?
-  boothNumber String?
-  category    String?
-  status      String?
-  size        String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model Sponsor {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  image       String?
-  level       String
-  amount      String?
-  status      String?
-  benefits    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model Partner {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  image       String?
-  type        String?
-  website     String?
-  status      String?
-  contribution String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model MediaPartner {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  image       String?
-  website     String?
-  type        String?
-  priority    Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model Order {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  orderNumber String
-  customerName String
-  customerEmail String
-  amount      Float
-  status      String
-  paymentMethod String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model Enquiry {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  email       String
-  phone       String?
-  subject     String?
-  message     String
-  status      String   @default("New")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-}
-
-model UtmData {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  source      String?
-  medium      String?
-  campaign    String?
-  term        String?
-  content     String?
-  visits      Int      @default(0)
-  conversions Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
+model Agenda {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  projectId Json?  @unique
 }
 
 model AgendaDay {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  date        DateTime
-  dayNumber   Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String   @db.ObjectId
-  sessions    AgendaSession[]
-}
-
-model AgendaSession {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  startTime   String
-  endTime     String
-  color       String?
-  venue       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  day         AgendaDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
-  dayId       String    @db.ObjectId
-  items       AgendaItem[]
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @db.Date
+  date      DateTime @db.Date
+  dayNumber BigInt
+  name      String
+  projectId String   @db.ObjectId
+  updatedAt DateTime @db.Date
 }
 
 model AgendaItem {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  startTime   String
+  createdAt   DateTime @db.Date
+  description String
   endTime     String
+  sessionId   String   @db.ObjectId
+  startTime   String
+  title       String
   type        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  session     AgendaSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sessionId   String        @db.ObjectId
-  speakers    AgendaItemSpeaker[]
+  updatedAt   DateTime @db.Date
 }
 
 model AgendaItemSpeaker {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt   DateTime @default(now())
-
-  // Relations
-  agendaItem  AgendaItem @relation(fields: [agendaItemId], references: [id], onDelete: Cascade)
-  agendaItemId String    @db.ObjectId
-  speaker     Speaker   @relation(fields: [speakerId], references: [id], onDelete: Cascade)
-  speakerId   String    @db.ObjectId
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  agendaItemId Json?
+  /// Field referred in an index, but found no data to define the type.
+  speakerId    Json?
 
   @@unique([agendaItemId, speakerId])
-} 
+}
+
+model AgendaSession {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  color     String
+  createdAt DateTime @db.Date
+  dayId     String   @db.ObjectId
+  endTime   String
+  startTime String
+  title     String
+  updatedAt DateTime @db.Date
+  venue     String
+}
+
+model Attendee {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  checkedIn   Boolean
+  checkinTime DateTime @db.Date
+  company     String
+  createdAt   DateTime @db.Date
+  email       String
+  jobTitle    String
+  name        String
+  phone       String
+  projectId   String   @db.ObjectId
+  updatedAt   DateTime @db.Date
+}
+
+model Attendees {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  projectId Json?  @unique
+}
+
+model Campaign {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model ContactRequest {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model Delegate {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  address     String
+  booth       String
+  company     String
+  createdAt   DateTime @db.Date
+  description String
+  email       String
+  featured    Boolean
+  image       String
+  jobTitle    String
+  name        String
+  phone       String
+  priority    BigInt
+  projectId   String   @db.ObjectId
+  status      String
+  type        String
+  updatedAt   DateTime @db.Date
+}
+
+model Delegates {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  projectId Json?  @unique
+}
+
+model Discount {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  code Json?  @unique
+}
+
+model Enquiry {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model Exhibitor {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  boothNumber String
+  category    String
+  createdAt   DateTime @db.Date
+  image       String
+  name        String
+  projectId   String   @db.ObjectId
+  size        String
+  status      String
+  updatedAt   DateTime @db.Date
+}
+
+model Exhibitors {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  projectId Json?  @unique
+}
+
+model Lead {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model Marketing {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  projectId Json?  @unique
+}
+
+model MarketingCampaign {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model MediaPartner {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @db.Date
+  image     String
+  name      String
+  priority  BigInt
+  projectId String   @db.ObjectId
+  type      String
+  updatedAt DateTime @db.Date
+  website   String
+}
+
+model Order {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model Package {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model Partner {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  contribution String
+  createdAt    DateTime @db.Date
+  image        String
+  name         String
+  projectId    String   @db.ObjectId
+  status       String
+  type         String
+  updatedAt    DateTime @db.Date
+  website      String
+}
+
+model Partners {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  projectId Json?  @unique
+}
+
+model Project {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime  @db.Date
+  currency    String
+  description String
+  endDate     DateTime? @db.Date
+  name        String
+  startDate   DateTime? @db.Date
+  updatedAt   DateTime  @db.Date
+  venue       String
+  website     String
+  year        String
+}
+
+model ProjectStats {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt     DateTime @db.Date
+  delegates     BigInt
+  exhibitors    BigInt
+  mediaPartners BigInt
+  partners      BigInt
+  projectId     String   @unique @db.ObjectId
+  speakers      BigInt
+  sponsors      BigInt
+  updatedAt     DateTime @db.Date
+}
+
+model Session {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model Speaker {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model SpeakerSession {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  sessionId Json?
+  /// Field referred in an index, but found no data to define the type.
+  speakerId Json?
+
+  @@unique([speakerId, sessionId])
+}
+
+model Speakers {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  projectId Json?  @unique
+}
+
+model Sponsor {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model Sponsors {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  projectId Json?  @unique
+}
+
+model Ticket {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model Ticketing {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  projectId Json?  @unique
+}
+
+model User {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  email Json?  @unique
+}
+
+model UtmData {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  campaign    String
+  content     String
+  conversions BigInt
+  createdAt   DateTime @db.Date
+  medium      String
+  name        String
+  projectId   String   @db.ObjectId
+  source      String
+  term        String
+  updatedAt   DateTime @db.Date
+  visits      BigInt
+  websiteUrl  String
+}
+
+model agendadays {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  v         Int      @map("__v")
+  date      DateTime @db.Date
+  dayNumber Int
+  name      String
+}
+
+model agendaitems {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model agendaitemspeakers {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model agendasessions {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model exhibitors {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model projects {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model speakers {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
